@@ -19,7 +19,8 @@ table! {
 }
 
 table! {
-    user (user_id) {
+    user (id) {
+        id -> Unsigned<Bigint>,
         user_id -> Varchar,
         username -> Text,
         public_key -> Text,
