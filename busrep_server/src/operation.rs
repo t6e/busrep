@@ -74,7 +74,7 @@ pub fn save_register_blockchain(
     };
 
     let new_block = NewBlock {
-        action: "Post",
+        action: "Register",
         action_id: &user.id,
         digital_signature: &req_register.digital_signature,
         created: &created,

@@ -20,6 +20,24 @@ pub async fn post(req_post: web::Json<RequestPost>) -> impl Responder {
 
 pub async fn register(req_register: web::Json<RequestRegister>) -> impl Responder {
     let connection = establish_connection();
+    println!(
+        "{}",
+        format!(
+            "{digital_signature}",
+            digital_signature = req_register.digital_signature,
+        )
+    );
+    // println!(
+    //     "{}",
+    //     format!(
+    //         "{user_id}{username}{public_key}{next_public_key}{digital_signature}",
+    //         user_id = req_register.user_id,
+    //         username = req_register.username,
+    //         public_key = req_register.public_key,
+    //         next_public_key = req_register.next_public_key,
+    //         digital_signature = req_register.digital_signature,
+    //     )
+    // );
 
     if !check_register_format(&req_register) {
         panic!("Incorrect Format");
