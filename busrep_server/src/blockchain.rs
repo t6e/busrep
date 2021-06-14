@@ -10,11 +10,11 @@ pub fn created() -> String {
 pub fn previous_hash(block: Block) -> String {
     let mut hasher = Sha256::new();
     hasher.input_str(&format!(
-        "{id}{action}{action_id}{ds}{created}{previous_hash}",
-        id = block.block_id,
+        "{block_id}{action}{action_id}{digital_signature}{created}{previous_hash}",
+        block_id = block.block_id,
         action = block.action,
         action_id = block.action_id,
-        ds = block.digital_signature,
+        digital_signature = block.digital_signature,
         created = block.created,
         previous_hash = block.previous_hash
     ));

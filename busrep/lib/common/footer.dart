@@ -19,7 +19,7 @@ class _Footer extends State<Footer> {
     Icons.notifications,
   ];
 
-  var _mainBody = [View(), Notice()];
+  var _mainBody = [ViewPage(), Notice()];
 
   @override
   void initState() {

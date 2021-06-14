@@ -35,15 +35,36 @@ class RegisterMetaData {
 
 class PostMetaData {
   final String userID;
-  final String username;
+  final String content;
   final ChainedKeys chainedKeys;
   final List<int> digitalSignature;
   final int maxBlockID;
 
   PostMetaData(
       {this.userID,
-      this.username,
+      this.content,
       this.chainedKeys,
       this.digitalSignature,
       this.maxBlockID});
+
+  Future<Map<String, dynamic>> toJson4Post() async {
+    return {
+      "user_id": userID,
+      "content": content,
+      "public_key":
+          jsonEncode((await chainedKeys.keyPair.extractPublicKey()).bytes),
+      "next_public_key":
+          jsonEncode((await chainedKeys.nextKeyPair.extractPublicKey()).bytes),
+      "digital_signature": jsonEncode(digitalSignature),
+      "max_block_id": maxBlockID
+    };
+  }
+
+  Future<Post> myPost(int postID) async {
+    return Post(
+        postID: postID,
+        content: content,
+        publicKey: await chainedKeys.keyPair.extractPublicKey(),
+        nextPublicKey: await chainedKeys.nextKeyPair.extractPublicKey());
+  }
 }

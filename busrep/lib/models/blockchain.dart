@@ -36,11 +36,22 @@ class Block {
     return Block(
         blockID: json["block_id"],
         action: json["action"],
-        actionID: json["actionID"],
+        actionID: json["action_id"],
         digitalSignature: jsonDecodeDigitalSignature(json["digital_signature"]),
         created: json["created"],
         previousHash: json["previous_hash"],
         userID: "None");
+  }
+
+  factory Block.fromMap(Map<String, dynamic> map) {
+    return Block(
+        blockID: map["block_id"],
+        action: map["action"],
+        actionID: map["action_id"],
+        digitalSignature: jsonDecodeDigitalSignature(map["digital_signature"]),
+        created: map["created"],
+        previousHash: map["previous_hash"],
+        userID: map["user_id"]);
   }
 }
 

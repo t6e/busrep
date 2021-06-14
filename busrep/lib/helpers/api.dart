@@ -36,3 +36,18 @@ Future<Blockchain> requestRegister(RegisterMetaData registerMetaData) async {
     throw Exception('Failed to request register');
   }
 }
+
+Future<Blockchain> requestPost(PostMetaData postMetaData) async {
+  final response = await http.post(
+    Uri.http(await url, "/post"),
+    body: jsonEncode(await postMetaData.toJson4Post()),
+    headers: {"Content-Type": "application/json"},
+  );
+  if (response.statusCode == 200) {
+    final Blockchain blockchain =
+        Blockchain.fromJson(jsonDecode(response.body));
+    return blockchain;
+  } else {
+    throw Exception('Failed to request register');
+  }
+}

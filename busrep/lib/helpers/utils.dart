@@ -30,3 +30,23 @@ int isRegistered(
   }
   return -1;
 }
+
+void checkPosted(PostMetaData postMetaData, Blockchain responsePost) async {
+  final int postID = isPosted(postMetaData, responsePost);
+  if (postID == -1) {
+    Post myPost = await postMetaData.myPost(postID);
+    saveMyPost(myPost);
+    savePrivateKey(
+        await postMetaData.chainedKeys.nextKeyPair.extractPrivateKeyBytes());
+  }
+}
+
+int isPosted(PostMetaData postMetaData, Blockchain responsePost) {
+  List<int> digitalSignature = postMetaData.digitalSignature;
+  for (var block in responsePost.blockchain.reversed) {
+    if (listEquals(digitalSignature, block.digitalSignature)) {
+      return block.actionID;
+    }
+  }
+  return -1;
+}

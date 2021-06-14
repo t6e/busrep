@@ -20,13 +20,6 @@ pub async fn post(req_post: web::Json<RequestPost>) -> impl Responder {
 
 pub async fn register(req_register: web::Json<RequestRegister>) -> impl Responder {
     let connection = establish_connection();
-    println!(
-        "{}",
-        format!(
-            "{digital_signature}",
-            digital_signature = req_register.digital_signature,
-        )
-    );
     // println!(
     //     "{}",
     //     format!(

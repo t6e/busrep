@@ -1,5 +1,6 @@
 import 'package:busrep/helpers/userID.dart';
 import 'package:busrep/models/crypto.dart';
+import 'package:busrep/repositories/sharedPreferences.dart';
 import 'package:cryptography/cryptography.dart';
 
 import 'dart:convert';
@@ -10,8 +11,14 @@ final hasher = Sha256();
 // final aesCtr = AesCtr.with256bits(macAlgorithm: Hmac.sha256());
 
 // Chained Keys
-Future<ChainedKeys> createChainedKeys(String password) async {
+Future<ChainedKeys> createFirstChainedKeys(String password) async {
   SimpleKeyPair keyPair = await createKeyPairFromSeed(password);
+  SimpleKeyPair nextKeyPair = await generateKeyPair();
+  return ChainedKeys(keyPair: keyPair, nextKeyPair: nextKeyPair);
+}
+
+Future<ChainedKeys> createChainedKeys() async {
+  SimpleKeyPair keyPair = await loadKeyPair();
   SimpleKeyPair nextKeyPair = await generateKeyPair();
   return ChainedKeys(keyPair: keyPair, nextKeyPair: nextKeyPair);
 }
@@ -30,6 +37,11 @@ Future<SimpleKeyPair> createKeyPairFromPassword(
   final elements = hash.bytes;
 
   return ed25519.newKeyPairFromSeed(elements);
+}
+
+Future<SimpleKeyPair> loadKeyPair() async {
+  final List<int> privateKey = await loadPrivateKey();
+  return ed25519.newKeyPairFromSeed(privateKey);
 }
 
 Future<SimpleKeyPair> generateKeyPair() async {

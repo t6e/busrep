@@ -43,7 +43,9 @@ pub fn save_post_blockchain(conn: &MysqlConnection, post: Post, req_post: &Reque
     let created = created();
     let previous_hash = match last_block(conn) {
         Some(last_block) => previous_hash(last_block),
-        None => "GENESIS BLOCK".to_string(),
+        None => {
+            panic!("Impossible");
+        }
     };
 
     let new_block = NewBlock {

@@ -44,3 +44,9 @@ void saveMyPost(Post post) async {
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
 }
+
+Future<Block> getLastBlock() async {
+  final Database db = await database;
+  return Block.fromMap(
+      (await db.query("blockchain", orderBy: "block_id desc", limit: 1))[0]);
+}

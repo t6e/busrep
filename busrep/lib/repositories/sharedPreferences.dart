@@ -35,7 +35,7 @@ Future<List<int>> loadPrivateKey() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final privateKey = prefs.get("privateKey") ?? "None";
   if (privateKey != "None") {
-    return jsonDecode(privateKey);
+    return jsonDecode(privateKey).cast<int>() as List<int>;
   } else {
     return [];
   }
