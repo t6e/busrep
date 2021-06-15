@@ -10,7 +10,7 @@ Future<RegisterMetaData> createRegisterMetaData(
   ChainedKeys chainedKeys = await createFirstChainedKeys(password);
   String userID = await loadUserID();
   List<int> digitalSignature =
-      await createDigitalSignature(chainedKeys, username, userID);
+      await createRegisterDigitalSignature(chainedKeys, username, userID);
   return RegisterMetaData(
       userID: userID,
       username: username,
@@ -23,7 +23,7 @@ Future<PostMetaData> createPostMetaData(String content) async {
   final String userID = await loadUserID();
   final int maxBlockID = await loadMaxBlockID();
   final List<int> digitalSignature =
-      await createDigitalSignature(chainedKeys, content, userID);
+      await createPostDigitalSignature(chainedKeys, content, userID);
   return PostMetaData(
       userID: userID,
       content: content,

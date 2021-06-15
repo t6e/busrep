@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:busrep/helpers/crypto.dart';
 import 'package:cryptography/cryptography.dart';
 
 class User {
@@ -15,6 +16,25 @@ class User {
       this.username,
       this.publicKey,
       this.nextPublicKey});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'user_id': userID,
+      'username': username,
+      "public_key": jsonEncode(nextPublicKey.bytes)
+    };
+  }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json["id"],
+      userID: json["user_id"],
+      username: json["username"],
+      publicKey: deserializePublicKeyED25519(json["public_key"]),
+      nextPublicKey: deserializePublicKeyED25519(json["next_public_key"]),
+    );
+  }
 }
 
 class Post {
@@ -33,19 +53,28 @@ class Post {
       "next_public_key": jsonEncode(nextPublicKey.bytes)
     };
   }
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      postID: json["post_id"],
+      content: json["content"],
+      publicKey: deserializePublicKeyED25519(json["public_key"]),
+      nextPublicKey: deserializePublicKeyED25519(json["next_public_key"]),
+    );
+  }
 }
 
 class PostData {
   final String content;
   final String username;
   final String userID;
-  final SimplePublicKey publicKey;
-  final SimplePublicKey nextPublicKey;
+  final String created;
 
-  PostData(
-      {this.content,
-      this.username,
-      this.userID,
-      this.publicKey,
-      this.nextPublicKey});
+  PostData({this.content, this.username, this.userID, this.created});
+}
+
+class IdentityTable {
+  Map<String, String> identityTable;
+
+  IdentityTable({this.identityTable});
 }

@@ -86,7 +86,6 @@ pub struct RequestUpdate {
 #[derive(Deserialize)]
 pub struct RequestView {
     pub user: Vec<u64>,
-    pub post: Vec<u64>,
 }
 
 #[derive(Serialize)]

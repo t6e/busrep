@@ -1,5 +1,8 @@
 import 'package:busrep/helpers/userID.dart';
+import 'package:busrep/models/blockchain.dart';
 import 'package:busrep/models/crypto.dart';
+import 'package:busrep/models/data.dart';
+import 'package:busrep/repositories/database.dart';
 import 'package:busrep/repositories/sharedPreferences.dart';
 import 'package:cryptography/cryptography.dart';
 
@@ -49,10 +52,20 @@ Future<SimpleKeyPair> generateKeyPair() async {
 }
 
 //DigitalSignature
-Future<List<int>> createDigitalSignature(
+Future<List<int>> createRegisterDigitalSignature(
     ChainedKeys chainedKeys, String username, String userID) async {
   final publicKey = await chainedKeys.nextKeyPair.extractPublicKey();
   final message = createRegisterMessage(username, userID, publicKey);
+  final hashedMessage = await hashMessage(message);
+  final Signature digitalSignature =
+      await ed25519.sign(hashedMessage, keyPair: chainedKeys.keyPair);
+  return digitalSignature.bytes;
+}
+
+Future<List<int>> createPostDigitalSignature(
+    ChainedKeys chainedKeys, String content, String userID) async {
+  final publicKey = await chainedKeys.nextKeyPair.extractPublicKey();
+  final message = createPostMessage(content, userID, publicKey);
   final hashedMessage = await hashMessage(message);
   final Signature digitalSignature =
       await ed25519.sign(hashedMessage, keyPair: chainedKeys.keyPair);
@@ -63,16 +76,74 @@ Future<List<int>> createDigitalSignature(
 String createRegisterMessage(
     String username, String userID, SimplePublicKey publicKey) {
   return jsonEncode({
-    "username": username,
     "userID": userID,
+    "username": username,
     "nextPublicKey": publicKey.bytes
   });
+}
+
+String createPostMessage(
+    String content, String userID, SimplePublicKey publicKey) {
+  return jsonEncode(
+      {"userID": userID, "content": content, "nextPublicKey": publicKey.bytes});
 }
 
 //Hash
 Future<List<int>> hashMessage(String message) async {
   final hash = await hasher.hash(utf8.encode(message));
   return hash.bytes;
+}
+
+//Verify
+void verifyRegisterBlockchain(
+    List<User> userList, Blockchain unknownRegisterBlockchain) async {
+  List<Block> blockchain = unknownRegisterBlockchain.blockchain;
+  blockchain.forEach((block) async {
+    User matchUser = userList.singleWhere((user) => user.id == block.actionID,
+        orElse: () => null);
+    if (matchUser == null) {
+      print("Action : ${block.action}");
+      print("ActionID : ${block.actionID}");
+      userList.forEach((user) {
+        print("ID : ${user.id}");
+      });
+    }
+    // print("UserList Length : ${userList.length}");
+    // print("Username : ${matchUser.username}");
+    bool result = await verifyRegisterBlock(block, matchUser);
+    if (result) {
+      associateUserIDWithBlock(block, matchUser.userID);
+      saveUser(matchUser);
+    }
+  });
+}
+
+Future<bool> verifyRegisterBlock(Block block, User matchUser) async {
+  final message = createRegisterMessage(
+      matchUser.username, matchUser.userID, matchUser.nextPublicKey);
+  final hashedMessage = await hashMessage(message);
+  final digitalSignature =
+      Signature(block.digitalSignature, publicKey: matchUser.publicKey);
+  final result =
+      await ed25519.verify(hashedMessage, signature: digitalSignature);
+  return result;
+}
+
+Future<bool> verifyPostBlock(Block block, Post matchPost) async {
+  final message = createPostMessage(
+      matchPost.content, block.userID, matchPost.nextPublicKey);
+  final hashedMessage = await hashMessage(message);
+  final digitalSignature =
+      Signature(block.digitalSignature, publicKey: matchPost.publicKey);
+  final result =
+      await ed25519.verify(hashedMessage, signature: digitalSignature);
+  return result;
+}
+
+// Deserialize
+SimplePublicKey deserializePublicKeyED25519(String publicKey) {
+  return SimplePublicKey(jsonDecode(publicKey).cast<int>(),
+      type: KeyPairType.ed25519);
 }
 
 //
@@ -95,11 +166,7 @@ Future<List<int>> hashMessage(String message) async {
 //   return jsonEncode(signature.bytes);
 // }
 //
-// // Deserialize
-// SimplePublicKey deserializePublicKeyED25519(String publicKey) {
-//   return SimplePublicKey(jsonDecode(publicKey).cast<int>(),
-//       type: KeyPairType.ed25519);
-// }
+
 //
 // SimplePublicKey deserializePublicKeyX25519(String publicKey) {
 //   return SimplePublicKey(jsonDecode(publicKey).cast<int>(),

@@ -127,12 +127,9 @@ pub fn get_user_by_id(conn: &MysqlConnection, req_view: &RequestView) -> Vec<Use
     }
 }
 
-pub fn get_post_by_id(conn: &MysqlConnection, req_view: &RequestView) -> Vec<Post> {
+pub fn get_all_post(conn: &MysqlConnection) -> Vec<Post> {
     use crate::schema::post::dsl::*;
-    match post
-        .filter(crate::schema::post::dsl::post_id.eq_any(&req_view.post))
-        .load::<Post>(conn)
-    {
+    match post.load::<Post>(conn) {
         Ok(x) => x,
         Err(_) => Vec::new(),
     }

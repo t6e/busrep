@@ -22,6 +22,10 @@ pub async fn register(req_register: web::Json<RequestRegister>) -> impl Responde
     let connection = establish_connection();
     // println!(
     //     "{}",
+    //     format!("{username}", username = req_register.username,)
+    // );
+    // println!(
+    //     "{}",
     //     format!(
     //         "{user_id}{username}{public_key}{next_public_key}{digital_signature}",
     //         user_id = req_register.user_id,
@@ -37,6 +41,9 @@ pub async fn register(req_register: web::Json<RequestRegister>) -> impl Responde
     }
 
     let user = save_user(&connection, &req_register);
+
+    // println!("{}", format!("{username}", username = user.username));
+    // println!("ID : {}", format!("{id}", id = user.id));
     save_register_blockchain(&connection, user, &req_register);
     let full_blockchain = get_full_blockchain(&connection);
     HttpResponse::Ok().json(ResponseBlockchain {
@@ -46,8 +53,11 @@ pub async fn register(req_register: web::Json<RequestRegister>) -> impl Responde
 
 pub async fn view<'a>(req_view: web::Json<RequestView>) -> impl Responder {
     let connection = establish_connection();
+    // println!("ID2 : {}", format!("{id}", id = req_view.user[0]));
     let user = get_user_by_id(&connection, &req_view);
-    let post = get_post_by_id(&connection, &req_view);
+    let post = get_all_post(&connection);
+
+    // println!("ID3 : {}", format!("{id}", id = user[0].id));
 
     HttpResponse::Ok().json(ResponseView {
         user: user,

@@ -1,3 +1,4 @@
+import 'package:busrep/helpers/blockchain.dart';
 import 'package:busrep/models/blockchain.dart';
 import 'package:busrep/models/metaData.dart';
 import 'package:busrep/models/response.dart';
@@ -47,6 +48,39 @@ Future<Blockchain> requestPost(PostMetaData postMetaData) async {
     final Blockchain blockchain =
         Blockchain.fromJson(jsonDecode(response.body));
     return blockchain;
+  } else {
+    throw Exception('Failed to request register');
+  }
+}
+
+Future<Blockchain> requestBlockchain() async {
+  final int maxBlockID = await loadMaxBlockID();
+  final response = await http.post(
+    Uri.http(await url, "/update"),
+    body: jsonEncode({"max_block_id": maxBlockID}),
+    headers: {"Content-Type": "application/json"},
+  );
+  if (response.statusCode == 200) {
+    final Blockchain blockchain =
+        Blockchain.fromJson(jsonDecode(response.body));
+    return blockchain;
+  } else {
+    throw Exception('Failed to request register');
+  }
+}
+
+Future<ResponseView> requestView(Blockchain unknownRegisterBlockchain) async {
+  final List<int> unknownRegisterActionIDList =
+      unknownRegisterBlockchain.getActionID();
+  final response = await http.post(
+    Uri.http(await url, "/view"),
+    body: jsonEncode({"user": unknownRegisterActionIDList}),
+    headers: {"Content-Type": "application/json"},
+  );
+  if (response.statusCode == 200) {
+    final ResponseView responseView =
+        ResponseView.fromJson(jsonDecode(response.body));
+    return responseView;
   } else {
     throw Exception('Failed to request register');
   }

@@ -5,6 +5,20 @@ class ResponseView {
   final List<Post> post;
 
   ResponseView({this.user, this.post});
+
+  factory ResponseView.fromJson(Map<String, dynamic> json) {
+    List<User> userList = [];
+    json["user"].forEach((jsonUser) {
+      User user = User.fromJson(jsonUser);
+      userList.add(user);
+    });
+    List<Post> postList = [];
+    json["post"].forEach((jsonPost) {
+      Post post = Post.fromJson(jsonPost);
+      postList.add(post);
+    });
+    return ResponseView(user: userList, post: postList);
+  }
 }
 
 class ResponseUserIDList {

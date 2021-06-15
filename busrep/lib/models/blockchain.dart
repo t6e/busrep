@@ -9,7 +9,7 @@ class Block {
   final List<int> digitalSignature;
   final String created;
   final String previousHash;
-  final String userID;
+  String userID;
 
   Block(
       {this.blockID,
@@ -44,6 +44,9 @@ class Block {
   }
 
   factory Block.fromMap(Map<String, dynamic> map) {
+    if (map["action"] == "Post") {
+      print("userID: ${map["user_id"]}");
+    }
     return Block(
         blockID: map["block_id"],
         action: map["action"],
@@ -67,5 +70,22 @@ class Blockchain {
       blockchain.add(block);
     });
     return Blockchain(blockchain: blockchain);
+  }
+
+  factory Blockchain.fromMap(List<Map<String, dynamic>> blockList) {
+    List<Block> blockchain = [];
+    blockList.forEach((mapBlock) {
+      Block block = Block.fromMap(mapBlock);
+      blockchain.add(block);
+    });
+    return Blockchain(blockchain: blockchain);
+  }
+
+  List<int> getActionID() {
+    List<int> blockIDList = [];
+    blockchain.forEach((block) {
+      blockIDList.add(block.actionID);
+    });
+    return blockIDList;
   }
 }
