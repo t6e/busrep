@@ -44,9 +44,6 @@ class Block {
   }
 
   factory Block.fromMap(Map<String, dynamic> map) {
-    if (map["action"] == "Post") {
-      print("userID: ${map["user_id"]}");
-    }
     return Block(
         blockID: map["block_id"],
         action: map["action"],

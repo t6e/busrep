@@ -101,15 +101,6 @@ void verifyRegisterBlockchain(
   blockchain.forEach((block) async {
     User matchUser = userList.singleWhere((user) => user.id == block.actionID,
         orElse: () => null);
-    if (matchUser == null) {
-      print("Action : ${block.action}");
-      print("ActionID : ${block.actionID}");
-      userList.forEach((user) {
-        print("ID : ${user.id}");
-      });
-    }
-    // print("UserList Length : ${userList.length}");
-    // print("Username : ${matchUser.username}");
     bool result = await verifyRegisterBlock(block, matchUser);
     if (result) {
       associateUserIDWithBlock(block, matchUser.userID);

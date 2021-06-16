@@ -80,7 +80,6 @@ void associateUserIDWithBlock(Block block, String userID) async {
     whereArgs: [block.blockID],
     conflictAlgorithm: ConflictAlgorithm.fail,
   );
-  print("UserID is saved");
 }
 
 Future<String> getUsernameByUserID(String userID) async {

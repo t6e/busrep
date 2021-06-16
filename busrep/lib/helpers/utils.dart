@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:busrep/helpers/crypto.dart';
 import 'package:busrep/models/blockchain.dart';
 import 'package:busrep/models/data.dart';
 import 'package:busrep/models/metaData.dart';
@@ -49,4 +52,47 @@ int isPosted(PostMetaData postMetaData, Blockchain responsePost) {
     }
   }
   return -1;
+}
+
+Future<List<PostData>> associateUserIDWithPostBlockchain(
+    List<Post> postList) async {
+  Blockchain postBlockchain = await getPostBlockchain();
+  Map<String, String> identityTable = (await getIdentityTable()).identityTable;
+  List<PostData> postDataList = [];
+  for (var block in postBlockchain.blockchain) {
+    Post matchPost = postList.singleWhere(
+        (post) => post.postID == block.actionID,
+        orElse: () => null);
+    if (block.userID != "None") {
+      if (await verifyPostBlock(block, matchPost)) {
+        postDataList.add(PostData(
+            content: matchPost.content,
+            username: await getUsernameByUserID(block.userID),
+            userID: block.userID,
+            created: block.created));
+      }
+    } else {
+      String publicKey = jsonEncode(matchPost.publicKey.bytes);
+      String userID = identityTable.keys.firstWhere(
+          (userID) => identityTable[userID] == publicKey,
+          orElse: () => null);
+      if (userID != null) {
+        String nextPublicKey = jsonEncode(matchPost.nextPublicKey.bytes);
+        identityTable[userID] = nextPublicKey;
+        associateUserIDWithBlock(block, userID);
+        block.userID = userID;
+      } else {
+        throw Exception('Failed to update UserID');
+      }
+
+      if (await verifyPostBlock(block, matchPost)) {
+        postDataList.add(PostData(
+            content: matchPost.content,
+            username: await getUsernameByUserID(block.userID),
+            userID: block.userID,
+            created: block.created));
+      }
+    }
+  }
+  return postDataList;
 }
