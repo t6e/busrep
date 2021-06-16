@@ -52,17 +52,6 @@ user_id_list : クライアントが登録するときに既に使われてい�
 例えば,ユーザ名がUSER 1であれば、ユーザIDが異なるので色が違っている。  
 <img src="https://user-images.githubusercontent.com/62014389/122200761-4d4ac100-ced6-11eb-9b67-2b91038e54b8.jpg" width="720px">
 
-### データベース
-サーバ:MariaDB  
- user(id,user_id,username,public_key,next_public_key)  
- post(post_id,content,public_key,next_public_key)  
- blockchain(block_id,action,action_id,digital_signature,created,previous_hash)  
- 
-クライアント:SQLite  
- user(id,user_id,name,public_key)  
- my_post(post_id,content,public_key,next_public_key)  
- blockchain(block_id,action,action_id,digital_signature,created,previous_hash,user_id)  
-
 ## 仕組み
 ## アルゴリズム
 ## ブロックチェーンの構造
@@ -124,6 +113,18 @@ Public Key AからPrivate Key Aを推定することは非常に困難です。
 ブロックに含まれる電子署名と返された登録データを照合しながら、ユーザ情報を保存する
 #### List<PostData> postDataList = associateUserIDWithPostBlockchain(responseView.post)
 ブロックに含まれる電子署名と返された投稿データを照合しながら、ある投稿の投稿者が誰であるか特定しブロックに投稿者を登録することで閲覧するためのデータを作成する
+
+### データベース
+サーバ:MariaDB  
+ user(id,user_id,username,public_key,next_public_key)  
+ post(post_id,content,public_key,next_public_key)  
+ blockchain(block_id,action,action_id,digital_signature,created,previous_hash)  
+ 
+クライアント:SQLite  
+ user(id,user_id,name,public_key)  
+ my_post(post_id,content,public_key,next_public_key)  
+ blockchain(block_id,action,action_id,digital_signature,created,previous_hash,user_id)  
+
 　
 ## 技術
 ### フレームワーク・ライブラリ
